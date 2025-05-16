@@ -65,6 +65,8 @@ export async function generateCitationFromText({
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000");
 
+  console.log("Base URL:", baseUrl);
+
   // Fetch the CSL file from the public directory
   const cslResponse = await fetch(`${baseUrl}/csl/${style}.csl`);
   if (!cslResponse.ok) {
