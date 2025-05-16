@@ -7,6 +7,7 @@ import { login } from "@/actions/loginAction";
 
 export default function Login() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "rohitcse.bit@gmail.com",
     password: "Pulsar200n$",
@@ -55,6 +56,7 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
+      setIsLoading(true);
       // Get the form from the event
       const form = e.target as HTMLFormElement;
       // Create a FormData object
@@ -71,6 +73,8 @@ export default function Login() {
           ...errors,
           password: "Invalid email or password",
         });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -160,9 +164,17 @@ export default function Login() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition duration-200"
+            disabled={isLoading}
+            className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign in
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin mr-2"></div>
+                Signing in...
+              </div>
+            ) : (
+              "Sign in"
+            )}
           </button>
 
           {/* Divider */}

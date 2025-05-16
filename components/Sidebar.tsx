@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Plus,
@@ -13,14 +13,28 @@ import {
   Home,
   MapPin,
   FileText,
+  Loader2,
 } from "lucide-react";
 
 interface SidebarProps {
   currentPath?: string;
-  onLogout?: () => void;
+  onLogout?: () => Promise<void>;
 }
 
 export function Sidebar({ currentPath = "", onLogout }: SidebarProps) {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (onLogout) {
+      setIsLoggingOut(true);
+      try {
+        await onLogout();
+      } finally {
+        setIsLoggingOut(false);
+      }
+    }
+  };
+
   const navigationItems = [
     {
       name: "New",
@@ -83,7 +97,7 @@ export function Sidebar({ currentPath = "", onLogout }: SidebarProps) {
     {
       name: "Logout",
       icon: <LogOut className="w-5 h-5" />,
-      action: onLogout,
+      action: handleLogout,
     },
   ];
 
@@ -140,10 +154,15 @@ export function Sidebar({ currentPath = "", onLogout }: SidebarProps) {
               return (
                 <li key={item.name}>
                   <button
-                    onClick={item.action}
-                    className="flex flex-col items-center justify-center py-3 w-full text-xs text-gray-600 hover:text-purple-700"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="flex flex-col items-center justify-center py-3 w-full text-xs text-gray-600 hover:text-purple-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {item.icon}
+                    {isLoggingOut ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      item.icon
+                    )}
                     <span className="mt-1 text-center">{item.name}</span>
                   </button>
                 </li>

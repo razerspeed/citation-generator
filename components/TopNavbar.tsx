@@ -112,16 +112,6 @@ export function TopNavbar({ currentPath = "", onSignOut }: TopNavbarProps) {
         </ul>
       </nav>
 
-      {/* Sign Out Button */}
-      {onSignOut && (
-        <button
-          onClick={onSignOut}
-          className="ml-4 px-4 py-2 text-sm text-gray-600 hover:text-purple-700 transition-colors"
-        >
-          Sign Out
-        </button>
-      )}
-
       {/* Mobile Menu Button */}
       <div className="md:hidden">
         <button
@@ -158,20 +148,6 @@ export function TopNavbar({ currentPath = "", onSignOut }: TopNavbarProps) {
                   </Link>
                 </li>
               ))}
-              {/* Sign Out Button in Mobile Menu */}
-              {onSignOut && (
-                <li>
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      onSignOut();
-                    }}
-                    className="flex items-center px-2 py-2 text-sm text-gray-600 hover:text-purple-700 transition-colors w-full text-left"
-                  >
-                    Sign Out
-                  </button>
-                </li>
-              )}
             </ul>
           </nav>
         </div>
