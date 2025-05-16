@@ -14,7 +14,8 @@ export async function generateCitationFromText({
   format?: "html" | "text";
 }) {
   console.log("Generating citation from text.......");
-  const cslPath = path.join(process.cwd(), "csl", `${style}.csl`);
+  // const cslPath = path.join(process.cwd(), "csl", `${style}.csl`);
+  const cslPath = path.join(process.cwd(), "public", "csl", `${style}.csl`);
   const cslFile = await fs.readFile(cslPath, "utf-8");
 
   const cite = new Cite(data);
