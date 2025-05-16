@@ -107,7 +107,7 @@ export function CitationForm({
   };
 
   return (
-    <div className="bg-white border border-gray-300 rounded-md shadow-md p-6">
+    <div className="bg-white border border-gray-300 rounded-md shadow-md p-6 h-full flex flex-col">
       {/* Citation Type Tabs */}
       <div className="flex border-b border-gray-200 mb-6">
         <button
@@ -145,8 +145,11 @@ export function CitationForm({
         </button>
       </div>
 
-      <form onSubmit={handleSubmit(onFormSubmit)}>
-        <div className="space-y-4">
+      <form
+        onSubmit={handleSubmit(onFormSubmit)}
+        className="flex flex-col flex-1 overflow-hidden"
+      >
+        <div className="flex-1 overflow-y-auto space-y-4 pr-2">
           {/* Common author field for all citation types */}
           <div>
             <label
@@ -199,7 +202,7 @@ export function CitationForm({
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label
                     htmlFor="publisherName"
@@ -241,7 +244,7 @@ export function CitationForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label
                     htmlFor="edition"
@@ -283,7 +286,7 @@ export function CitationForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label
                     htmlFor="medium"
@@ -380,7 +383,7 @@ export function CitationForm({
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label
                     htmlFor="volume"
@@ -442,7 +445,7 @@ export function CitationForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label
                     htmlFor="publisherName"
@@ -539,7 +542,7 @@ export function CitationForm({
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label
                     htmlFor="datePublished"
@@ -614,7 +617,7 @@ export function CitationForm({
           )}
 
           {/* Common fields for all citation types */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label
                 htmlFor="editors"
@@ -657,7 +660,7 @@ export function CitationForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label
                 htmlFor="url"
@@ -702,9 +705,11 @@ export function CitationForm({
               />
             </div>
           </div>
+        </div>
 
-          <div className="flex justify-end space-x-4 mt-6">
-            {/* Only show cancel button if onCancel has an actual function */}
+        {/* Submit Button - Fixed at bottom */}
+        <div className="pt-4 mt-4 bg-white border-t">
+          <div className="flex justify-end space-x-4">
             {onCancel !== (() => {}) && (
               <button
                 type="button"

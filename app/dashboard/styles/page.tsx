@@ -9,6 +9,7 @@ import { ReferencesList } from "@/components/styles/ReferencesList";
 import { Style } from "@/types/styles";
 import { CitationFormData } from "@/types/schemas";
 import { fetchCitations, createCitation } from "@/actions/citations";
+import { Toast } from "@/components/Toast";
 
 export default function StylesPage() {
   const [selectedStyle, setSelectedStyle] = useState<Style | null>(null);
@@ -17,6 +18,15 @@ export default function StylesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCitation, setSelectedCitation] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
   useEffect(() => {
     loadReferences();
@@ -38,10 +48,13 @@ export default function StylesPage() {
     setSelectedStyle(style);
     setSearchTerm(style.name);
 
-    // Scroll to the citation form
-    document
-      .querySelector(".citation-form")
-      ?.scrollIntoView({ behavior: "smooth" });
+    // Wait for the next tick to ensure the citation form is rendered
+    setTimeout(() => {
+      const citationForm = document.querySelector(".citation-form");
+      if (citationForm) {
+        citationForm.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
   };
 
   const handleCitationSelect = (citation: any) => {
@@ -105,10 +118,13 @@ export default function StylesPage() {
 
     setFormData(newFormData);
 
-    // Scroll to the citation form
-    document
-      .querySelector(".citation-form")
-      ?.scrollIntoView({ behavior: "smooth" });
+    // Wait for the next tick to ensure the citation form is rendered
+    setTimeout(() => {
+      const citationForm = document.querySelector(".citation-form");
+      if (citationForm) {
+        citationForm.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
   };
 
   const handleGenerateCitation = async (data: CitationFormData) => {
@@ -168,11 +184,21 @@ export default function StylesPage() {
       const { error } = await createCitation(citationData);
       if (error) throw new Error(error);
 
+      setToast({
+        show: true,
+        message: "Citation generated and saved successfully",
+        type: "success",
+      });
+
       // Reload the references list
       await loadReferences();
     } catch (err: any) {
       console.error("Error creating citation:", err);
-      alert(err.message || "Failed to save citation. Please try again.");
+      setToast({
+        show: true,
+        message: err.message || "Failed to save citation",
+        type: "error",
+      });
     }
   };
 
@@ -271,8 +297,11 @@ export default function StylesPage() {
         </div>
       ) : (
         /* Citation Form and Preview */
-        <div className="mb-8 citation-form bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex flex-row gap-8 justify-between mb-4">
+        <div
+          id="citation-section"
+          className="mb-8 citation-form bg-white rounded-xl border border-gray-200 p-6 shadow-sm"
+        >
+          <div className="flex flex-col lg:flex-row gap-4 justify-between mb-4">
             <h2 className="text-xl font-semibold text-purple-800">
               Citation Information
             </h2>
@@ -281,15 +310,15 @@ export default function StylesPage() {
             </h2>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 h-full">
+          <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Column - Citation Form */}
-            <div className="flex-1">
-              <p className="text-gray-600 mb-6">
+            <div className="flex-1 w-1/2">
+              <p className="text-gray-600 mb-4">
                 Enter the details for your citation. The preview will appear on
                 the right.
               </p>
 
-              <div className="h-full">
+              <div className="h-[calc(100vh-350px)] min-h-[500px]">
                 <CitationForm
                   selectedStyle={
                     selectedStyle || {
@@ -306,12 +335,12 @@ export default function StylesPage() {
             </div>
 
             {/* Right Column - Citation Preview */}
-            <div className="flex-1">
-              <p className="text-gray-600 mb-6">
+            <div className="flex-1 w-1/2">
+              <p className="text-gray-600 mb-4">
                 This is how your citation will appear.
               </p>
 
-              <div className="h-full">
+              <div className="h-[calc(100vh-350px)] min-h-[500px]">
                 <CitationPreview
                   formData={formData}
                   selectedStyle={selectedStyle}
@@ -356,6 +385,14 @@ export default function StylesPage() {
             Generate a citation above to get started
           </p>
         </div>
+      )}
+
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+        />
       )}
     </div>
   );

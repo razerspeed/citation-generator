@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Style } from "@/types/styles";
 import { CitationFormData } from "@/types/schemas";
 import { generateCitationFromText } from "@/actions/generateCitation";
+import { Copy } from "lucide-react";
 
 interface CitationPreviewProps {
   formData: CitationFormData | null;
@@ -24,6 +25,25 @@ export function CitationPreview({
   const [bibliography, setBibliography] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedInText, setCopiedInText] = useState(false);
+  const [copiedBibliography, setCopiedBibliography] = useState(false);
+
+  const handleCopy = async (text: string, type: "inText" | "bibliography") => {
+    try {
+      // Remove HTML tags from the text
+      const cleanText = text.replace(/<[^>]*>/g, "");
+      await navigator.clipboard.writeText(cleanText);
+      if (type === "inText") {
+        setCopiedInText(true);
+        setTimeout(() => setCopiedInText(false), 2000);
+      } else {
+        setCopiedBibliography(true);
+        setTimeout(() => setCopiedBibliography(false), 2000);
+      }
+    } catch (err) {
+      console.error("Failed to copy text:", err);
+    }
+  };
 
   useEffect(() => {
     // If we have an existing citation, use that instead of generating new ones
@@ -151,8 +171,8 @@ export function CitationPreview({
 
   if (!formData && !existingCitation) {
     return (
-      <div className="bg-white border border-gray-300 rounded-md shadow-md p-6 min-h-[600px] flex flex-col">
-        <div className="h-full flex flex-col items-center justify-center text-center">
+      <div className="bg-white border border-gray-300 rounded-md shadow-md p-6 h-full flex flex-col">
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
           <div className="text-gray-400 mb-4">
             <svg
               className="w-16 h-16 mx-auto"
@@ -181,9 +201,9 @@ export function CitationPreview({
   }
 
   return (
-    <div className="bg-white border border-gray-300 rounded-md shadow-md p-6 min-h-[600px] flex flex-col">
+    <div className="bg-white border border-gray-300 rounded-md shadow-md p-6 h-full flex flex-col">
       {isLoading ? (
-        <div className="h-full flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
             <p className="text-gray-600">Generating citation...</p>
@@ -195,9 +215,9 @@ export function CitationPreview({
           <p>{error}</p>
         </div>
       ) : (
-        <div className="space-y-6 h-full">
+        <div className="flex-1 flex flex-col">
           {/* Citation Style Badge */}
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
             <div className="flex items-center">
               <svg
                 className="h-5 w-5 text-blue-500 mr-2"
@@ -223,42 +243,60 @@ export function CitationPreview({
             </div>
           </div>
 
-          <div>
-            <h3 className="font-semibold text-lg mb-3">In-text Citation:</h3>
-            <div className="p-4 bg-gray-50 border border-gray-200 rounded-md">
-              {citation ? (
-                <div dangerouslySetInnerHTML={{ __html: citation }} />
-              ) : (
-                <p className="text-gray-500 italic">
-                  No citation generated yet.
-                </p>
-              )}
+          <div className="flex-1 space-y-8">
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold text-lg">In-text Citation:</h3>
+                <button
+                  onClick={() => handleCopy(citation, "inText")}
+                  className="inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-gray-900 gap-1"
+                >
+                  <Copy className="h-4 w-4" />
+                  {copiedInText ? "Copied!" : "Copy"}
+                </button>
+              </div>
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-md mb-8">
+                {citation ? (
+                  <div dangerouslySetInnerHTML={{ __html: citation }} />
+                ) : (
+                  <p className="text-gray-500 italic">
+                    No citation generated yet.
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <h3 className="font-semibold text-lg mb-3">Bibliography Entry:</h3>
-            <div className="p-4 bg-gray-50 border border-gray-200 rounded-md">
-              {bibliography ? (
-                <div
-                  className="font-serif"
-                  dangerouslySetInnerHTML={{ __html: bibliography }}
-                />
-              ) : (
-                <p className="text-gray-500 italic">
-                  No bibliography entry generated yet.
-                </p>
-              )}
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold text-lg">Bibliography Entry:</h3>
+                <button
+                  onClick={() => handleCopy(bibliography, "bibliography")}
+                  className="inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-gray-900 gap-1"
+                >
+                  <Copy className="h-4 w-4" />
+                  {copiedBibliography ? "Copied!" : "Copy"}
+                </button>
+              </div>
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-md">
+                {bibliography ? (
+                  <div
+                    className="font-serif"
+                    dangerouslySetInnerHTML={{ __html: bibliography }}
+                  />
+                ) : (
+                  <p className="text-gray-500 italic">
+                    No bibliography entry generated yet.
+                  </p>
+                )}
+              </div>
             </div>
+
+            {/* <p className="text-sm text-gray-500 mt-2">
+              Formatted according to the{" "}
+              <span className="font-medium">{selectedStyle.name}</span> style
+              guide.
+            </p> */}
           </div>
-
-          {/* <p className="text-sm text-gray-500 mt-2">
-            Formatted according to the{" "}
-            <span className="font-medium">{selectedStyle.name}</span> style
-            guide.
-          </p> */}
-
-          <div className="flex-grow"></div>
         </div>
       )}
     </div>

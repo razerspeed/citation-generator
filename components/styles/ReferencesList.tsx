@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Download, Copy, CheckCircle2, Trash2 } from "lucide-react";
 import { deleteCitation } from "@/actions/citations";
 import { exportCitationsToCSV } from "@/utils/exportCitations";
+import { Toast } from "@/components/Toast";
 
 interface Reference {
   id: string;
@@ -48,6 +49,15 @@ export function ReferencesList({
   const [deletingStates, setDeletingStates] = useState<{
     [key: string]: boolean;
   }>({});
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -96,23 +106,32 @@ export function ReferencesList({
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
+    e.preventDefault();
 
-    if (window.confirm("Are you sure you want to delete this citation?")) {
-      try {
-        setDeletingStates((prev) => ({ ...prev, [id]: true }));
-        const { error } = await deleteCitation(id);
+    try {
+      setDeletingStates((prev) => ({ ...prev, [id]: true }));
+      const { error } = await deleteCitation(id);
 
-        if (error) {
-          throw new Error(error);
-        }
-
-        onDelete?.();
-      } catch (err) {
-        console.error("Error deleting citation:", err);
-        alert("Failed to delete citation. Please try again.");
-      } finally {
-        setDeletingStates((prev) => ({ ...prev, [id]: false }));
+      if (error) {
+        throw new Error(error);
       }
+
+      setToast({
+        show: true,
+        message: "Citation deleted successfully",
+        type: "success",
+      });
+
+      onDelete?.();
+    } catch (err) {
+      console.error("Error deleting citation:", err);
+      setToast({
+        show: true,
+        message: "Failed to delete citation",
+        type: "error",
+      });
+    } finally {
+      setDeletingStates((prev) => ({ ...prev, [id]: false }));
     }
   };
 
@@ -304,6 +323,14 @@ export function ReferencesList({
           </div>
         ))}
       </div>
+
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+        />
+      )}
     </div>
   );
 }
