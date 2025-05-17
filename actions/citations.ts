@@ -126,6 +126,20 @@ export async function createCitation(citationData: CitationData) {
   }
 }
 
+export async function deleteSelectedCitations(ids: string[]) {
+  const supabase = await createClient();
+
+  try {
+    const { error } = await supabase.from("citations").delete().in("id", ids);
+
+    if (error) throw error;
+    return { error: null };
+  } catch (error: any) {
+    console.error("Error deleting citations:", error);
+    return { error: error.message };
+  }
+}
+
 // Helper functions to generate citations
 function generateInTextCitation(data: CitationData): string {
   // Get the first author's name and extract the last name

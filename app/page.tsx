@@ -45,49 +45,52 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="flex-grow bg-gradient-to-b from-purple-50 to-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center">
-            <div className="lg:w-1/2 mb-10 lg:mb-0">
-              <h1 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-                Generate Perfect Citations in Seconds
+      <main className="flex-grow">
+        <div className="container mx-auto px-4 py-16">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            {/* Left Column - Text Content */}
+            <div className="flex-1 text-center lg:text-left">
+              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                Generate Perfect Citations{" "}
+                <span className="text-purple-700">in Seconds</span>
               </h1>
-              <p className="text-lg text-gray-700 mb-8">
-                CitationPro helps students, researchers, and academics create
-                accurate citations in multiple formats with ease. Save time and
-                ensure your citations are always correct.
+              <p className="text-xl text-gray-600 mb-8">
+                Create accurate citations in any style with our easy-to-use
+                citation generator. Perfect for students, researchers, and
+                academics.
               </p>
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
-                  href="/dashboard/styles"
-                  className="px-6 py-3 bg-purple-700 text-white rounded-md text-center hover:bg-purple-800 transition-colors"
+                  href="/register"
+                  className="px-8 py-3 bg-purple-700 text-white rounded-md hover:bg-purple-800 transition-colors text-lg font-medium"
                 >
-                  Start Citing Now
+                  Get Started Free
                 </Link>
                 <Link
-                  href="/features"
-                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md text-center hover:bg-gray-50 transition-colors"
+                  href="/dashboard/styles"
+                  className="px-8 py-3 border-2 border-purple-700 text-purple-700 rounded-md hover:bg-purple-50 transition-colors text-lg font-medium"
                 >
-                  Learn More
+                  Try Demo
                 </Link>
               </div>
             </div>
-            <div className="lg:w-1/2 lg:pl-10">
-              <div className="bg-white p-6 rounded-lg shadow-xl">
-                <div className="relative w-full h-[300px] rounded-md overflow-hidden">
-                  <Image
-                    src="/images/citation-demo.png"
-                    alt="Citation Tool Preview"
-                    fill
-                    className="object-contain"
-                    unoptimized
-                  />
-                </div>
+
+            {/* Right Column - Image */}
+            <div className="flex-1 relative">
+              <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden shadow-2xl">
+                <Image
+                  src="/Citation-Generator.png"
+                  alt="Citation Generator Interface"
+                  fill
+                  className="object-contain bg-white"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </main>
 
       {/* Features Section */}
       <section className="py-16 bg-white">

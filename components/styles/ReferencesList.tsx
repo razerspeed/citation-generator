@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Download, Copy, CheckCircle2, Trash2 } from "lucide-react";
-import { deleteCitation } from "@/actions/citations";
+import { deleteCitation, deleteSelectedCitations } from "@/actions/citations";
 import { exportCitationsToCSV } from "@/utils/exportCitations";
-import { Toast } from "@/components/Toast";
+import { toast } from "react-toastify";
 
 interface Reference {
   id: string;
@@ -49,15 +49,6 @@ export function ReferencesList({
   const [deletingStates, setDeletingStates] = useState<{
     [key: string]: boolean;
   }>({});
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: "success" | "error";
-  }>({
-    show: false,
-    message: "",
-    type: "success",
-  });
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -116,22 +107,42 @@ export function ReferencesList({
         throw new Error(error);
       }
 
-      setToast({
-        show: true,
-        message: "Citation deleted successfully",
-        type: "success",
-      });
-
+      toast.success("Citation deleted successfully");
       onDelete?.();
     } catch (err) {
       console.error("Error deleting citation:", err);
-      setToast({
-        show: true,
-        message: "Failed to delete citation",
-        type: "error",
-      });
+      toast.error("Failed to delete citation");
     } finally {
       setDeletingStates((prev) => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedItems.size === 0) {
+      toast.error("Please select at least one citation to delete.");
+      return;
+    }
+
+    try {
+      const { error } = await deleteSelectedCitations(
+        Array.from(selectedItems)
+      );
+
+      if (error) {
+        throw new Error(error);
+      }
+
+      toast.success(
+        `Successfully deleted ${selectedItems.size} citation${
+          selectedItems.size === 1 ? "" : "s"
+        }`
+      );
+
+      setSelectedItems(new Set());
+      onDelete?.();
+    } catch (err) {
+      console.error("Error deleting citations:", err);
+      toast.error("Failed to delete citations");
     }
   };
 
@@ -170,7 +181,7 @@ export function ReferencesList({
                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
               />
             </svg>
-            {title}
+            Saved Citations
           </h2>
           <div className={`flex-1 ${showBorder ? "" : ""}`}></div>
         </div>
@@ -195,18 +206,32 @@ export function ReferencesList({
                 {references.length === 1 ? "citation" : "citations"} saved
               </div>
             </div>
-            <button
-              onClick={handleExport}
-              disabled={selectedItems.size === 0}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium ${
-                selectedItems.size > 0
-                  ? "text-white bg-purple-600 hover:bg-purple-700"
-                  : "text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed"
-              } rounded-md transition-colors`}
-            >
-              <Download className="h-4 w-4" />
-              Export as CSV
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleBulkDelete}
+                disabled={selectedItems.size === 0}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium ${
+                  selectedItems.size > 0
+                    ? "text-white bg-red-600 hover:bg-red-700"
+                    : "text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed"
+                } rounded-md transition-colors`}
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Selected
+              </button>
+              <button
+                onClick={handleExport}
+                disabled={selectedItems.size === 0}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium ${
+                  selectedItems.size > 0
+                    ? "text-white bg-purple-600 hover:bg-purple-700"
+                    : "text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed"
+                } rounded-md transition-colors`}
+              >
+                <Download className="h-4 w-4" />
+                Export as CSV
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -323,14 +348,6 @@ export function ReferencesList({
           </div>
         ))}
       </div>
-
-      {toast.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
-        />
-      )}
     </div>
   );
 }

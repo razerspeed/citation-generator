@@ -149,7 +149,7 @@ export function CitationForm({
         onSubmit={handleSubmit(onFormSubmit)}
         className="flex flex-col flex-1 overflow-hidden"
       >
-        <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+        <div className="flex-1 px-1 py-1 overflow-y-auto space-y-4 pr-3">
           {/* Common author field for all citation types */}
           <div>
             <label
@@ -202,8 +202,8 @@ export function CitationForm({
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="relative">
                   <label
                     htmlFor="publisherName"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -223,7 +223,7 @@ export function CitationForm({
                   />
                 </div>
 
-                <div>
+                <div className="relative">
                   <label
                     htmlFor="publisherPlace"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -244,8 +244,8 @@ export function CitationForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="relative">
                   <label
                     htmlFor="edition"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -265,7 +265,7 @@ export function CitationForm({
                   />
                 </div>
 
-                <div>
+                <div className="relative">
                   <label
                     htmlFor="volume"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -286,8 +286,8 @@ export function CitationForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="relative">
                   <label
                     htmlFor="medium"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -307,7 +307,7 @@ export function CitationForm({
                   />
                 </div>
 
-                <div>
+                <div className="relative">
                   <label
                     htmlFor="source"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -617,8 +617,8 @@ export function CitationForm({
           )}
 
           {/* Common fields for all citation types */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="relative">
               <label
                 htmlFor="editors"
                 className="block text-sm font-medium text-gray-700 mb-1"
@@ -636,7 +636,7 @@ export function CitationForm({
               />
             </div>
 
-            <div>
+            <div className="relative">
               <label
                 htmlFor="date"
                 className="block text-sm font-medium text-gray-700 mb-1"
@@ -660,8 +660,8 @@ export function CitationForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="relative">
               <label
                 htmlFor="url"
                 className="block text-sm font-medium text-gray-700 mb-1"
@@ -687,7 +687,7 @@ export function CitationForm({
               )}
             </div>
 
-            <div>
+            <div className="relative">
               <label
                 htmlFor="doi"
                 className="block text-sm font-medium text-gray-700 mb-1"
@@ -708,25 +708,41 @@ export function CitationForm({
         </div>
 
         {/* Submit Button - Fixed at bottom */}
-        <div className="pt-4 mt-4 bg-white border-t">
+        <div className="pt-4 mt-4 bg-white">
           <div className="flex justify-end space-x-4">
-            {onCancel !== (() => {}) && (
-              <button
-                type="button"
-                onClick={onCancel}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                const defaultValues: BookCitationFormData = {
+                  type: "book",
+                  authors: "",
+                  editors: "",
+                  url: "",
+                  doi: "",
+                  date: "",
+                  bookTitle: "",
+                  publisherName: "",
+                  publisherPlace: "",
+                  edition: "",
+                  volume: "",
+                  medium: "",
+                  source: "",
+                };
+                reset(defaultValues);
+                setCitationType("book");
+              }}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+            >
+              Reset
+            </button>
 
             <button
               type="submit"
-              className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+              className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white cursor-pointer ${
                 hasValidStyle
                   ? "bg-blue-600 hover:bg-blue-700"
                   : "bg-blue-400 cursor-not-allowed"
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+              }`}
               disabled={!hasValidStyle}
             >
               {hasValidStyle ? "Generate Citation" : "Select Style First"}

@@ -9,7 +9,8 @@ import { ReferencesList } from "@/components/styles/ReferencesList";
 import { Style } from "@/types/styles";
 import { CitationFormData } from "@/types/schemas";
 import { fetchCitations, createCitation } from "@/actions/citations";
-import { Toast } from "@/components/Toast";
+import { toast } from "react-toastify";
+import { Trash2, Download } from "lucide-react";
 
 export default function StylesPage() {
   const [selectedStyle, setSelectedStyle] = useState<Style | null>(null);
@@ -18,15 +19,6 @@ export default function StylesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCitation, setSelectedCitation] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type: "success" | "error";
-  }>({
-    show: false,
-    message: "",
-    type: "success",
-  });
 
   useEffect(() => {
     loadReferences();
@@ -127,9 +119,11 @@ export default function StylesPage() {
     }, 100);
   };
 
-  const handleGenerateCitation = async (data: CitationFormData) => {
+  const handleSubmit = async (data: CitationFormData) => {
     if (!selectedStyle) {
-      alert("Please select a citation style before generating a citation.");
+      toast.error(
+        "Please select a citation style before generating a citation."
+      );
       return;
     }
 
@@ -184,21 +178,13 @@ export default function StylesPage() {
       const { error } = await createCitation(citationData);
       if (error) throw new Error(error);
 
-      setToast({
-        show: true,
-        message: "Citation generated and saved successfully",
-        type: "success",
-      });
+      toast.success("Citation generated and saved successfully");
 
       // Reload the references list
       await loadReferences();
     } catch (err: any) {
       console.error("Error creating citation:", err);
-      setToast({
-        show: true,
-        message: err.message || "Failed to save citation",
-        type: "error",
-      });
+      toast.error(err.message || "Failed to save citation");
     }
   };
 
@@ -328,7 +314,7 @@ export default function StylesPage() {
                     }
                   }
                   onCancel={() => {}}
-                  onSubmit={handleGenerateCitation}
+                  onSubmit={handleSubmit}
                   initialData={formData}
                 />
               </div>
@@ -353,47 +339,25 @@ export default function StylesPage() {
       )}
 
       {/* References List */}
-      {loading ? (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-700"></div>
-        </div>
-      ) : references.length > 0 ? (
-        <ReferencesList
-          references={references}
-          onCitationSelect={handleCitationSelect}
-          onDelete={loadReferences}
-        />
-      ) : (
-        <div className="text-center py-12 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
-          <svg
-            className="mx-auto h-12 w-12 text-purple-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <h3 className="mt-2 text-lg font-medium text-purple-900">
-            No citations yet
-          </h3>
-          <p className="mt-1 text-sm text-purple-600">
-            Generate a citation above to get started
-          </p>
-        </div>
-      )}
-
-      {toast.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
-        />
-      )}
+      <div className="max-w-6xl mx-auto">
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-700"></div>
+          </div>
+        ) : references.length > 0 ? (
+          <ReferencesList
+            references={references}
+            onCitationSelect={handleCitationSelect}
+            onDelete={loadReferences}
+          />
+        ) : (
+          <ReferencesList
+            references={[]}
+            onCitationSelect={handleCitationSelect}
+            onDelete={loadReferences}
+          />
+        )}
+      </div>
     </div>
   );
 }
