@@ -53,28 +53,22 @@ export function StyleSearch({
 
   useEffect(() => {
     // Scroll to highlighted item when using keyboard navigation
-    if (highlightedIndex >= 0 && listRef.current) {
+    if (highlightedIndex >= 0 && listRef.current && dropdownRef.current) {
       const highlightedItem = listRef.current.children[
         highlightedIndex
       ] as HTMLElement;
+
       if (highlightedItem) {
-        // Calculate if element is in view
-        const container = dropdownRef.current;
+        const container = dropdownRef.current.querySelector(".overflow-y-auto");
         if (container) {
           const containerRect = container.getBoundingClientRect();
           const elementRect = highlightedItem.getBoundingClientRect();
 
           // Check if element is outside viewport
           if (elementRect.bottom > containerRect.bottom) {
-            highlightedItem.scrollIntoView({
-              block: "end",
-              behavior: "smooth",
-            });
+            container.scrollTop += elementRect.bottom - containerRect.bottom;
           } else if (elementRect.top < containerRect.top) {
-            highlightedItem.scrollIntoView({
-              block: "start",
-              behavior: "smooth",
-            });
+            container.scrollTop -= containerRect.top - elementRect.top;
           }
         }
       }
@@ -102,16 +96,20 @@ export function StyleSearch({
       return;
     }
 
+    if (filteredStyles.length === 0) return; // Don't handle navigation if no results
+
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
         setHighlightedIndex((prev: number) =>
-          prev < filteredStyles.length - 1 ? prev + 1 : prev
+          prev < filteredStyles.length - 1 ? prev + 1 : 0
         );
         break;
       case "ArrowUp":
         e.preventDefault();
-        setHighlightedIndex((prev: number) => (prev > 0 ? prev - 1 : 0));
+        setHighlightedIndex((prev: number) =>
+          prev > 0 ? prev - 1 : filteredStyles.length - 1
+        );
         break;
       case "Enter":
         e.preventDefault();

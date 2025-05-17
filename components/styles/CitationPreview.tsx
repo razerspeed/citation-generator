@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Style } from "@/types/styles";
 import { CitationFormData } from "@/types/schemas";
 import { generateCitationFromText } from "@/actions/generateCitation";
-import { Copy } from "lucide-react";
+import { Copy, CheckCircle2 } from "lucide-react";
 
 interface CitationPreviewProps {
   formData: CitationFormData | null;
@@ -25,21 +25,19 @@ export function CitationPreview({
   const [bibliography, setBibliography] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [copiedInText, setCopiedInText] = useState(false);
-  const [copiedBibliography, setCopiedBibliography] = useState(false);
+  const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   const handleCopy = async (text: string, type: "inText" | "bibliography") => {
     try {
       // Remove HTML tags from the text
       const cleanText = text.replace(/<[^>]*>/g, "");
       await navigator.clipboard.writeText(cleanText);
-      if (type === "inText") {
-        setCopiedInText(true);
-        setTimeout(() => setCopiedInText(false), 2000);
-      } else {
-        setCopiedBibliography(true);
-        setTimeout(() => setCopiedBibliography(false), 2000);
-      }
+      setCopiedStates({ ...copiedStates, [type]: true });
+      setTimeout(() => {
+        setCopiedStates((prev) => ({ ...prev, [type]: false }));
+      }, 2000);
     } catch (err) {
       console.error("Failed to copy text:", err);
     }
@@ -251,7 +249,11 @@ export function CitationPreview({
                   onClick={() => handleCopy(citation, "inText")}
                   className="text-purple-600 hover:text-purple-700 p-2 rounded-full hover:bg-purple-50 transition-colors"
                 >
-                  <Copy className="h-4 w-4" />
+                  {copiedStates["inText"] ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </button>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 break-words">
@@ -269,7 +271,11 @@ export function CitationPreview({
                   onClick={() => handleCopy(bibliography, "bibliography")}
                   className="text-purple-600 hover:text-purple-700 p-2 rounded-full hover:bg-purple-50 transition-colors"
                 >
-                  <Copy className="h-4 w-4" />
+                  {copiedStates["bibliography"] ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </button>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 break-words">
