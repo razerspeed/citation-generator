@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 export default function SignUp() {
   const router = useRouter();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -77,6 +78,7 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
+      setIsLoading(true);
       const form = e.target as HTMLFormElement;
       const formData = new FormData(form);
       try {
@@ -88,6 +90,8 @@ export default function SignUp() {
           ...errors,
           email: "Registration failed. This email might already be in use.",
         });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -233,9 +237,17 @@ export default function SignUp() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition duration-200"
+            disabled={isLoading}
+            className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign up
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin mr-2"></div>
+                Signing up...
+              </div>
+            ) : (
+              "Sign up"
+            )}
           </button>
 
           {/* Divider */}
@@ -333,7 +345,7 @@ export default function SignUp() {
                     setShowSuccessModal(false);
                     router.push("/login");
                   }}
-                  className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition duration-200"
+                  className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-md transition duration-200 cursor-pointer"
                 >
                   Go to Login
                 </button>

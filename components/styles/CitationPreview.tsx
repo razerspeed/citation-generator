@@ -232,8 +232,8 @@ export function CitationPreview({
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <div>
-                <p className="text-blue-700 text-sm">
+              <div className="flex-1 min-w-0">
+                <p className="text-blue-700 text-sm truncate">
                   <span className="font-medium">Citation style:</span>{" "}
                   {existingCitation?.citation_data?.style ||
                     selectedStyle?.name ||
@@ -243,26 +243,22 @@ export function CitationPreview({
             </div>
           </div>
 
-          <div className="flex-1 space-y-8">
+          <div className="flex-1 space-y-8 overflow-y-auto">
             <div>
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-semibold text-lg">In-text Citation:</h3>
                 <button
                   onClick={() => handleCopy(citation, "inText")}
-                  className="inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-gray-900 gap-1"
+                  className="text-purple-600 hover:text-purple-700 p-2 rounded-full hover:bg-purple-50 transition-colors"
                 >
                   <Copy className="h-4 w-4" />
-                  {copiedInText ? "Copied!" : "Copy"}
                 </button>
               </div>
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-md mb-8">
-                {citation ? (
-                  <div dangerouslySetInnerHTML={{ __html: citation }} />
-                ) : (
-                  <p className="text-gray-500 italic">
-                    No citation generated yet.
-                  </p>
-                )}
+              <div className="bg-gray-50 rounded-lg p-4 break-words">
+                <p
+                  className="text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: citation }}
+                />
               </div>
             </div>
 
@@ -271,31 +267,18 @@ export function CitationPreview({
                 <h3 className="font-semibold text-lg">Bibliography Entry:</h3>
                 <button
                   onClick={() => handleCopy(bibliography, "bibliography")}
-                  className="inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-gray-900 gap-1"
+                  className="text-purple-600 hover:text-purple-700 p-2 rounded-full hover:bg-purple-50 transition-colors"
                 >
                   <Copy className="h-4 w-4" />
-                  {copiedBibliography ? "Copied!" : "Copy"}
                 </button>
               </div>
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-md">
-                {bibliography ? (
-                  <div
-                    className="font-serif"
-                    dangerouslySetInnerHTML={{ __html: bibliography }}
-                  />
-                ) : (
-                  <p className="text-gray-500 italic">
-                    No bibliography entry generated yet.
-                  </p>
-                )}
+              <div className="bg-gray-50 rounded-lg p-4 break-words">
+                <p
+                  className="text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: bibliography }}
+                />
               </div>
             </div>
-
-            {/* <p className="text-sm text-gray-500 mt-2">
-              Formatted according to the{" "}
-              <span className="font-medium">{selectedStyle.name}</span> style
-              guide.
-            </p> */}
           </div>
         </div>
       )}

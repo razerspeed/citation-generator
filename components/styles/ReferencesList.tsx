@@ -186,8 +186,8 @@ export function ReferencesList({
           <div className={`flex-1 ${showBorder ? "" : ""}`}></div>
         </div>
 
-        <div className="bg-purple-50 rounded-lg p-6 mb-6">
-          <div className="flex justify-between items-center">
+        <div className="bg-purple-50 rounded-lg p-4 sm:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <input
@@ -206,11 +206,11 @@ export function ReferencesList({
                 {references.length === 1 ? "citation" : "citations"} saved
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={handleBulkDelete}
                 disabled={selectedItems.size === 0}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium ${
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium w-full sm:w-auto justify-center ${
                   selectedItems.size > 0
                     ? "text-white bg-red-600 hover:bg-red-700"
                     : "text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed"
@@ -222,7 +222,7 @@ export function ReferencesList({
               <button
                 onClick={handleExport}
                 disabled={selectedItems.size === 0}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium ${
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium w-full sm:w-auto justify-center ${
                   selectedItems.size > 0
                     ? "text-white bg-purple-600 hover:bg-purple-700"
                     : "text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed"
@@ -248,27 +248,43 @@ export function ReferencesList({
                 onCitationSelect?.(reference);
               }
             }}
-            className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:border-purple-300 hover:shadow-sm transition-all"
+            className={`bg-white rounded-lg border border-gray-200 p-4 sm:p-6 cursor-pointer hover:border-purple-300 transition-colors ${
+              selectedItems.has(reference.id) ? "border-purple-500" : ""
+            }`}
           >
-            <div className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                checked={selectedItems.has(reference.id)}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  handleSelectItem(reference.id);
-                }}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+              <div className="flex items-start gap-4">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.has(reference.id)}
+                  onChange={() => handleSelectItem(reference.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                />
+                <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-500 capitalize">
+                        {reference.citation_data.type}
+                      </span>
+                      <span className="text-gray-300">•</span>
+                      <span className="text-sm text-gray-500">
+                        {reference.citation_data.style}
+                      </span>
+                    </div>
+                    <span className="text-gray-300 hidden sm:inline">•</span>
+                    <span className="text-sm text-gray-500">
+                      {formatDate(reference.created_at)}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                        <span className="text-sm font-medium text-gray-700">
+                          Main Citation:
+                        </span>
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-700">
-                            Main Citation:
-                          </p>
                           <button
                             onClick={(e) =>
                               handleCopy(
@@ -278,69 +294,58 @@ export function ReferencesList({
                                 "main"
                               )
                             }
-                            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                            title="Copy main citation"
+                            className="text-purple-600 hover:text-purple-700"
                           >
                             {copiedStates[`${reference.id}-main`] ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-600" />
+                              <CheckCircle2 className="h-4 w-4" />
                             ) : (
-                              <Copy className="h-4 w-4 text-gray-500" />
+                              <Copy className="h-4 w-4" />
                             )}
                           </button>
                           <button
                             onClick={(e) => handleDelete(e, reference.id)}
-                            className="p-1 hover:bg-gray-100 rounded-full transition-colors text-red-500 hover:text-red-600"
-                            title="Delete citation"
-                            disabled={deletingStates[reference.id]}
+                            className="text-red-600 hover:text-red-700"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            {deletingStates[reference.id] ? (
+                              <div className="h-4 w-4 border-2 border-t-red-600 rounded-full animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </button>
                         </div>
-                        <p className="text-gray-600">
-                          {reference.bibliography_citation}
-                        </p>
-                        <div className="flex gap-2 mt-2 text-sm text-gray-500">
-                          <span>
-                            {reference.citation_data.type
-                              .charAt(0)
-                              .toUpperCase() +
-                              reference.citation_data.type.slice(1)}
-                          </span>
-                          <span>•</span>
-                          <span>{reference.citation_data.style}</span>
-                          <span>•</span>
-                          <span>{formatDate(reference.created_at)}</span>
-                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-2 justify-end">
-                      <p className="font-medium text-gray-700">
-                        In-text citation:
+                      <p className="text-gray-600">
+                        {reference.bibliography_citation}
                       </p>
-                      <button
-                        onClick={(e) =>
-                          handleCopy(
-                            e,
-                            reference.in_text_citation,
-                            reference.id,
-                            "intext"
-                          )
-                        }
-                        className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                        title="Copy in-text citation"
-                      >
-                        {copiedStates[`${reference.id}-intext`] ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Copy className="h-4 w-4 text-gray-500" />
-                        )}
-                      </button>
                     </div>
-                    <p className="text-gray-600">
-                      {reference.in_text_citation}
-                    </p>
+
+                    <div>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                        <span className="text-sm font-medium text-gray-700">
+                          In-text citation:
+                        </span>
+                        <button
+                          onClick={(e) =>
+                            handleCopy(
+                              e,
+                              reference.in_text_citation,
+                              reference.id,
+                              "intext"
+                            )
+                          }
+                          className="text-purple-600 hover:text-purple-700"
+                        >
+                          {copiedStates[`${reference.id}-intext`] ? (
+                            <CheckCircle2 className="h-4 w-4" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-gray-600">
+                        {reference.in_text_citation}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -10,7 +10,6 @@ import { Style } from "@/types/styles";
 import { CitationFormData } from "@/types/schemas";
 import { fetchCitations, createCitation } from "@/actions/citations";
 import { toast } from "react-toastify";
-import { Trash2, Download } from "lucide-react";
 
 export default function StylesPage() {
   const [selectedStyle, setSelectedStyle] = useState<Style | null>(null);
@@ -24,8 +23,10 @@ export default function StylesPage() {
     loadReferences();
   }, []);
 
+  // Load references from the database
   const loadReferences = async () => {
     try {
+      // Fetch citations from the database using server actions
       const { data, error } = await fetchCitations();
       if (error) throw new Error(error);
       setReferences(data || []);
@@ -36,6 +37,7 @@ export default function StylesPage() {
     }
   };
 
+  // Handle style selection from the search bar
   const handleStyleSelect = (style: Style) => {
     setSelectedStyle(style);
     setSearchTerm(style.name);
@@ -44,6 +46,7 @@ export default function StylesPage() {
     setTimeout(() => {
       const citationForm = document.querySelector(".citation-form");
       if (citationForm) {
+        // Scroll to the citation form
         citationForm.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }, 100);
@@ -175,6 +178,7 @@ export default function StylesPage() {
         }),
       };
 
+      // Create the citation in the database using server actions
       const { error } = await createCitation(citationData);
       if (error) throw new Error(error);
 
@@ -214,49 +218,6 @@ export default function StylesPage() {
         </div>
       </div>
 
-      {/* Action Buttons */}
-      {/* <div className="flex justify-center gap-4 mb-8">
-        <button
-          onClick={() =>
-            document
-              .querySelector(".citation-form")
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          Create New Citation
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-            />
-          </svg>
-          Import References
-        </button>
-      </div> */}
-
       {/* Show placeholder when no style is selected */}
       {!selectedStyle && !selectedCitation ? (
         <div className="mb-12 text-center py-16 rounded-xl border border-purple-100">
@@ -285,26 +246,19 @@ export default function StylesPage() {
         /* Citation Form and Preview */
         <div
           id="citation-section"
-          className="mb-8 citation-form bg-white rounded-xl border border-gray-200 p-6 shadow-sm"
+          className="mb-8 citation-form bg-white rounded-xl border border-gray-200 p-8 shadow-sm"
         >
-          <div className="flex flex-col lg:flex-row gap-4 justify-between mb-4">
-            <h2 className="text-xl font-semibold text-purple-800">
-              Citation Information
-            </h2>
-            <h2 className="text-xl font-semibold text-purple-800">
-              Citation Preview
-            </h2>
-          </div>
-
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Column - Citation Form */}
-            <div className="flex-1 w-1/2">
-              <p className="text-gray-600 mb-4">
-                Enter the details for your citation. The preview will appear on
-                the right.
+            <div className="flex-1 lg:w-1/2 w-full bg-white rounded-lg border border-gray-100 p-6">
+              <h2 className="text-xl font-semibold text-purple-800 mb-2">
+                Citation Information
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Enter the details for your citation.
               </p>
 
-              <div className="h-[calc(100vh-350px)] min-h-[500px]">
+              <div className="min-h-[600px]">
                 <CitationForm
                   selectedStyle={
                     selectedStyle || {
@@ -321,12 +275,15 @@ export default function StylesPage() {
             </div>
 
             {/* Right Column - Citation Preview */}
-            <div className="flex-1 w-1/2">
-              <p className="text-gray-600 mb-4">
+            <div className="flex-1 lg:w-1/2 w-full bg-white rounded-lg border border-gray-100 p-6">
+              <h2 className="text-xl font-semibold text-purple-800 mb-2">
+                Citation Preview
+              </h2>
+              <p className="text-gray-600 mb-6">
                 This is how your citation will appear.
               </p>
 
-              <div className="h-[calc(100vh-350px)] min-h-[500px]">
+              <div className="min-h-[600px]">
                 <CitationPreview
                   formData={formData}
                   selectedStyle={selectedStyle}
