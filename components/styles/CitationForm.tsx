@@ -107,9 +107,9 @@ export function CitationForm({
   };
 
   return (
-    <div className="bg-white border border-gray-300 rounded-md shadow-md p-6 h-full flex flex-col">
+    <div className="bg-white h-full flex flex-col">
       {/* Citation Type Tabs */}
-      <div className="flex border-b border-gray-200 mb-6">
+      <div className="flex border-b border-gray-200 mb-4 sticky top-0 bg-white z-10">
         <button
           type="button"
           className={`py-2 px-4 font-medium text-sm ${
@@ -147,9 +147,10 @@ export function CitationForm({
 
       <form
         onSubmit={handleSubmit(onFormSubmit)}
-        className="flex flex-col flex-1 overflow-hidden"
+        className="flex flex-col h-full"
       >
-        <div className="flex-1 px-1 py-1 overflow-y-auto space-y-4 pr-3">
+        {/* Scrollable Form Fields */}
+        <div className="flex-1 overflow-y-auto space-y-4 pr-4 mb-4">
           {/* Common author field for all citation types */}
           <div>
             <label
@@ -707,8 +708,8 @@ export function CitationForm({
           </div>
         </div>
 
-        {/* Submit Button - Fixed at bottom */}
-        <div className="pt-4 mt-4 bg-white">
+        {/* Submit Button - Fixed at bottom inside container */}
+        <div className="sticky bottom-0 bg-white pt-4 border-t border-gray-200">
           <div className="flex justify-end space-x-4">
             <button
               type="button"

@@ -171,7 +171,7 @@ export function CitationPreview({
 
   if (!formData && !existingCitation) {
     return (
-      <div className="bg-white border border-gray-300 rounded-md shadow-md p-6 h-full flex flex-col">
+      <div className="h-full flex flex-col">
         <div className="flex-1 flex flex-col items-center justify-center text-center">
           <div className="text-gray-400 mb-4">
             <svg
@@ -201,7 +201,7 @@ export function CitationPreview({
   }
 
   return (
-    <div className="bg-white border border-gray-300 rounded-md shadow-md p-6 h-full flex flex-col">
+    <div className="h-full flex flex-col">
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center">

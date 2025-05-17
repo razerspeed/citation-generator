@@ -222,12 +222,12 @@ export function StyleSearch({
       {isDropdownOpen && (
         <div
           ref={dropdownRef}
-          className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-[60vh] overflow-hidden flex flex-col"
+          className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-[60vh] overflow-hidden flex flex-col"
           id="style-listbox"
           role="listbox"
         >
           {/* Sticky header with results count */}
-          <div className="sticky top-0 z-10 bg-white border-b border-gray-200 py-2 px-3 text-sm flex justify-between items-center">
+          <div className="sticky top-0 z-50 bg-white border-b border-gray-200 py-2 px-3 text-sm flex justify-between items-center">
             <span className="font-medium text-gray-700">
               {isLoading
                 ? "Searching..."
