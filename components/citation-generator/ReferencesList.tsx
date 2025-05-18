@@ -3,22 +3,41 @@ import { Download, Copy, CheckCircle2, Trash2 } from "lucide-react";
 import { deleteCitation, deleteSelectedCitations } from "@/actions/citations";
 import { exportCitationsToCSV } from "@/utils/exportCitations";
 import { toast } from "react-toastify";
+import { useCitation } from "@/contexts/CitationContext";
 
 interface Reference {
   id: string;
   citation_data: {
-    title: string;
-    type: string;
+    type: "book" | "journal" | "webpage";
     style: string;
-    authors?: string[];
-    year?: string;
-    journal?: string;
-    volume?: string;
-    issue?: string;
-    pages?: string;
+
+    // Common fields
+    authors?: string;
+    editors?: string;
+    date?: string;
     doi?: string;
     url?: string;
-    publisher?: string;
+    publisherName?: string;
+    volume?: string;
+
+    // Book specific fields
+    bookTitle?: string;
+    publisherPlace?: string;
+    edition?: string;
+    medium?: string;
+    source?: string;
+
+    // Journal specific fields
+    articleTitle?: string;
+    journalName?: string;
+    issue?: string;
+    pages?: string;
+    extra?: string;
+
+    // Webpage specific fields
+    websiteTitle?: string;
+    datePublished?: string;
+    dateAccessed?: string;
   };
   in_text_citation: string;
   bibliography_citation: string;
@@ -27,7 +46,6 @@ interface Reference {
 
 interface ReferencesListProps {
   references: Reference[];
-  onCitationSelect?: (citation: Reference) => void;
   onDelete?: () => void;
   title?: string;
   showBorder?: boolean;
@@ -36,12 +54,13 @@ interface ReferencesListProps {
 
 export function ReferencesList({
   references,
-  onCitationSelect,
   onDelete,
   title = "Saved Citations",
   showBorder = true,
   showTopSpacing = true,
 }: ReferencesListProps) {
+  const { setFormData, setRenderedCitation, setSelectedStyle, setSearchTerm } =
+    useCitation();
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>(
     {}
@@ -159,6 +178,91 @@ export function ReferencesList({
     exportCitationsToCSV(selectedCitations, `citations-${timestamp}.csv`);
   };
 
+  const handleCitationSelect = (reference: Reference) => {
+    // Set the form data from the citation data
+    const formData = (() => {
+      switch (reference.citation_data.type) {
+        case "book":
+          return {
+            type: "book" as const,
+            authors: reference.citation_data.authors || "",
+            editors: reference.citation_data.editors || "",
+            bookTitle: reference.citation_data.bookTitle || "",
+            publisherName: reference.citation_data.publisherName || "",
+            publisherPlace: reference.citation_data.publisherPlace || "",
+            edition: reference.citation_data.edition || "",
+            volume: reference.citation_data.volume || "",
+            medium: reference.citation_data.medium || "",
+            source: reference.citation_data.source || "",
+            doi: reference.citation_data.doi || "",
+            url: reference.citation_data.url || "",
+            date: reference.citation_data.date || "",
+          };
+        case "journal":
+          return {
+            type: "journal" as const,
+            authors: reference.citation_data.authors || "",
+            editors: reference.citation_data.editors || "",
+            articleTitle: reference.citation_data.articleTitle || "",
+            journalName: reference.citation_data.journalName || "",
+            volume: reference.citation_data.volume || "",
+            issue: reference.citation_data.issue || "",
+            pages: reference.citation_data.pages || "",
+            extra: reference.citation_data.extra || "",
+            publisherName: reference.citation_data.publisherName || "",
+            doi: reference.citation_data.doi || "",
+            url: reference.citation_data.url || "",
+            date: reference.citation_data.date || "",
+          };
+        case "webpage":
+          return {
+            type: "webpage" as const,
+            authors: reference.citation_data.authors || "",
+            editors: reference.citation_data.editors || "",
+            articleTitle: reference.citation_data.articleTitle || "",
+            websiteTitle: reference.citation_data.websiteTitle || "",
+            datePublished: reference.citation_data.datePublished || "",
+            dateAccessed: reference.citation_data.dateAccessed || "",
+            extra: reference.citation_data.extra || "",
+            doi: reference.citation_data.doi || "",
+            url: reference.citation_data.url || "",
+            date: reference.citation_data.date || "",
+          };
+        default:
+          return null;
+      }
+    })();
+
+    if (!formData) {
+      toast.error("Invalid citation type");
+      return;
+    }
+
+    // Set the style and search term
+    const styleName = reference.citation_data.style;
+    setSelectedStyle({
+      id: styleName.toLowerCase(),
+      name: styleName,
+      filename: styleName.toLowerCase(),
+    });
+    setSearchTerm(styleName);
+
+    // Set the form data
+    setFormData(formData);
+
+    // Set the rendered citation
+    setRenderedCitation({
+      inTextCitation: reference.in_text_citation,
+      bibliographyCitation: reference.bibliography_citation,
+    });
+
+    // Scroll to the citation form
+    const citationForm = document.querySelector(".citation-form");
+    if (citationForm) {
+      citationForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div
@@ -181,7 +285,7 @@ export function ReferencesList({
                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
               />
             </svg>
-            Saved Citations
+            {title}
           </h2>
           <div className={`flex-1 ${showBorder ? "" : ""}`}></div>
         </div>
@@ -245,7 +349,7 @@ export function ReferencesList({
                 !(e.target as HTMLElement).closest('input[type="checkbox"]') &&
                 !(e.target as HTMLElement).closest("button")
               ) {
-                onCitationSelect?.(reference);
+                handleCitationSelect(reference);
               }
             }}
             className={`bg-white rounded-lg border border-gray-200 p-4 sm:p-6 cursor-pointer hover:border-purple-300 transition-colors ${

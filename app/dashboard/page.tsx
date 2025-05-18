@@ -9,7 +9,7 @@ export default function DashboardHomePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Create Citation Card */}
         <Link
-          href="/dashboard/styles"
+          href="/dashboard/citation-generator"
           className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6 border border-gray-200 flex flex-col items-center text-center"
         >
           <div className="w-16 h-16 mb-4 rounded-full bg-purple-100 flex items-center justify-center group-hover:bg-purple-200 transition-colors">

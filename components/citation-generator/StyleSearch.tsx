@@ -1,22 +1,17 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from "react";
 import { Style } from "@/types/styles";
 import { useStyleSearch } from "@/hooks/useStyleSearch";
+import { useCitation } from "@/contexts/CitationContext";
+import styles from "@/data/csl-styles.json";
 
-interface StyleSearchProps {
-  styles: Style[];
-  onSelectStyle: (style: Style) => void;
-  selectedStyleId?: string;
-  searchTerm?: string;
-  onSearchTermChange?: (term: string) => void;
-}
+export function StyleSearch() {
+  const {
+    selectedStyle,
+    setSelectedStyle,
+    searchTerm: contextSearchTerm,
+    setSearchTerm: setContextSearchTerm,
+  } = useCitation();
 
-export function StyleSearch({
-  styles,
-  onSelectStyle,
-  selectedStyleId,
-  searchTerm: externalSearchTerm,
-  onSearchTermChange,
-}: StyleSearchProps) {
   const {
     searchTerm,
     setSearchTerm,
@@ -26,7 +21,7 @@ export function StyleSearch({
     setHighlightedIndex,
     isDropdownOpen,
     setIsDropdownOpen,
-  } = useStyleSearch(styles, externalSearchTerm);
+  } = useStyleSearch(styles, contextSearchTerm);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -75,16 +70,16 @@ export function StyleSearch({
     }
   }, [highlightedIndex]);
 
-  // Update search term when external search term changes
+  // Update search term when context search term changes
   useEffect(() => {
-    if (externalSearchTerm !== undefined) {
-      setSearchTerm(externalSearchTerm);
+    if (contextSearchTerm !== undefined) {
+      setSearchTerm(contextSearchTerm);
     }
-  }, [externalSearchTerm]);
+  }, [contextSearchTerm]);
 
   const handleStyleSelect = (style: Style) => {
-    onSelectStyle(style);
-    setSearchTerm(style.name);
+    setSelectedStyle(style);
+    setContextSearchTerm(style.name);
     setIsDropdownOpen(false);
   };
 
@@ -132,7 +127,7 @@ export function StyleSearch({
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTerm = e.target.value;
     setSearchTerm(newTerm);
-    onSearchTermChange?.(newTerm);
+    setContextSearchTerm(newTerm);
     setIsDropdownOpen(true);
   };
 
@@ -253,13 +248,13 @@ export function StyleSearch({
                         ? "bg-blue-50"
                         : "hover:bg-gray-50"
                     } ${
-                      selectedStyleId === style.id
+                      selectedStyle?.id === style.id
                         ? "border-l-4 border-blue-500 pl-3"
                         : "px-4"
                     }`}
                     onClick={() => handleStyleSelect(style)}
                     role="option"
-                    aria-selected={selectedStyleId === style.id}
+                    aria-selected={selectedStyle?.id === style.id}
                     onMouseEnter={() => setHighlightedIndex(index)}
                   >
                     <div className="py-3">
@@ -303,6 +298,9 @@ export function StyleSearch({
           </div>
         </div>
       )}
+      <div className="text-sm text-gray-500 mt-2 text-center">
+        {styles.length} citation styles available
+      </div>
     </div>
   );
 }

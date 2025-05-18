@@ -2,17 +2,49 @@
 
 import { useEffect, useState } from "react";
 import { fetchCitations } from "@/actions/citations";
-import { ReferencesList } from "@/components/styles/ReferencesList";
+import { ReferencesList } from "@/components/citation-generator/ReferencesList";
+import { CitationProvider } from "@/contexts/CitationContext";
 
 interface Citation {
   id: string;
-  citation_data: any;
+  citation_data: {
+    type: "book" | "journal" | "webpage";
+    style: string;
+
+    // Common fields
+    authors?: string;
+    editors?: string;
+    date?: string;
+    doi?: string;
+    url?: string;
+    publisherName?: string;
+    volume?: string;
+
+    // Book specific fields
+    bookTitle?: string;
+    publisherPlace?: string;
+    edition?: string;
+    medium?: string;
+    source?: string;
+
+    // Journal specific fields
+    articleTitle?: string;
+    journalName?: string;
+    issue?: string;
+    pages?: string;
+    extra?: string;
+
+    // Webpage specific fields
+    websiteTitle?: string;
+    datePublished?: string;
+    dateAccessed?: string;
+  };
   in_text_citation: string;
   bibliography_citation: string;
   created_at: string;
 }
 
-export default function LibraryPage() {
+function LibraryPageContent() {
   const [citations, setCitations] = useState<Citation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,11 +93,15 @@ export default function LibraryPage() {
         title="My Citations Library"
         showBorder={false}
         showTopSpacing={false}
-        onCitationSelect={(citation) => {
-          // You can implement navigation to the citation editor here if needed
-          console.log("Citation selected:", citation);
-        }}
       />
     </div>
+  );
+}
+
+export default function LibraryPage() {
+  return (
+    <CitationProvider>
+      <LibraryPageContent />
+    </CitationProvider>
   );
 }
